@@ -1,4 +1,9 @@
-const Filtres = ({ condamnationsPerPage, changeCondamnationsPerPage }) => {
+const Filtres = ({ condamnationsPerPage, changeCondamnationsPerPage, year, currentYear, changeCurrentYear }) => {
+    let years = [];
+
+    for (let i = 0; i < 5; i++) {
+        years = [...years, year - i];
+    }
 
     return (
         <form className="mb-3">
@@ -10,6 +15,15 @@ const Filtres = ({ condamnationsPerPage, changeCondamnationsPerPage }) => {
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
+                        </select>
+                    </div>
+
+                    <div className="col-3">
+                        <label htmlFor="years" className="form-label">Année</label>
+                        <select className="form-select" value={currentYear} onChange={(event) => changeCurrentYear(event.target.value)}>
+                            {years.map((year, index) => (
+                                <option key={index} value={year}>{year}</option>
+                            ))}
                         </select>
                     </div>
                 </div>

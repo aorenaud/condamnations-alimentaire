@@ -4,17 +4,20 @@ import Condamnations from './components/Condamnations';
 import Pagination from './components/Pagination';
 
 const App = () => {
-  const [condamnations, setCondamnations] = useState([]) // We want the result in an array
-  const [loading, setLoading] = useState(false) // Default loading is false
-  const [currentPage, setCurrentPage] = useState(1) // Default current page is 1
-  const [condamnationsPerPage, setCondamnationsPerPage] = useState(10) // Default condamnations per page is 10
-
+  const [condamnations, setCondamnations] = useState([]); // We want the result in an array
+  const [filteredCondamnations, setFilteredCondamnations] = useState([]); // We want the result in an array
+  const [loading, setLoading] = useState(false); // Default loading is false
+  const [currentPage, setCurrentPage] = useState(1); // Default current page is 1
+  const [condamnationsPerPage, setCondamnationsPerPage] = useState(10); // Default condamnations per page is 10
+  const [year] = useState(new Date().getFullYear()); // Default year is this year
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     const getCondamnations = async () => {
       setLoading(true);
       const condamnationsFromServer = await fetchCondamnations();
       setCondamnations(condamnationsFromServer);
+      setFilteredCondamnations(condamnationsFromServer);
       setLoading(false);
     }
 
@@ -29,10 +32,23 @@ const App = () => {
     return data.result.records;
   }
 
+  useEffect(() => {
+    const getFilteredCondamnations = () => {
+      const filtered = condamnations.filter(condamnation => {
+        if(condamnation.Date_jugement.substring(0,4) == currentYear) {
+          return condamnation
+        }
+      })
+      setFilteredCondamnations(filtered);
+    }
+
+    getFilteredCondamnations();
+  }, [currentYear])
+
   // Get current condamnations
   const indexOfLastCondamnation = currentPage * condamnationsPerPage;
   const indexOfFirstCondamnation = indexOfLastCondamnation - condamnationsPerPage;
-  const currentCondamnations = condamnations.slice(indexOfFirstCondamnation, indexOfLastCondamnation);
+  const currentCondamnations = filteredCondamnations.slice(indexOfFirstCondamnation, indexOfLastCondamnation);
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
@@ -40,11 +56,19 @@ const App = () => {
   // Change number of condamnations per page
   const changeCondamnationsPerPage = (number) => setCondamnationsPerPage(number);
 
+  // Change current year
+  const changeCurrentYear = (year) => setCurrentYear(year);
+
   return (
     <div className="App">
-      <Filtres condamnationsPerPage={condamnationsPerPage} changeCondamnationsPerPage={changeCondamnationsPerPage} />
+      <Filtres 
+        condamnationsPerPage={condamnationsPerPage} 
+        changeCondamnationsPerPage={changeCondamnationsPerPage}
+        year={year}
+        currentYear={currentYear}
+        changeCurrentYear={changeCurrentYear} />
       <Condamnations condamnations={currentCondamnations} loading={loading} />
-      <Pagination condamnationsPerPage={condamnationsPerPage} totalCondamnations={condamnations.length} paginate={paginate} />
+      <Pagination condamnationsPerPage={condamnationsPerPage} totalCondamnations={filteredCondamnations.length} paginate={paginate} />
     </div>
   );
 }
