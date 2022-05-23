@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Filtres from './components/Filtres';
 import Condamnations from './components/Condamnations';
 import Pagination from './components/Pagination';
 
@@ -36,8 +37,12 @@ const App = () => {
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
+  // Change number of condamnations per page
+  const changeCondamnationsPerPage = (number) => setCondamnationsPerPage(number);
+
   return (
     <div className="App">
+      <Filtres condamnationsPerPage={condamnationsPerPage} changeCondamnationsPerPage={changeCondamnationsPerPage} />
       <Condamnations condamnations={currentCondamnations} loading={loading} />
       <Pagination condamnationsPerPage={condamnationsPerPage} totalCondamnations={condamnations.length} paginate={paginate} />
     </div>
